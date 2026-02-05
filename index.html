@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Just For You 💖</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+
+body{
+  height:100vh;
+  background:#ffd6e5;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.card{
+  width:92%;
+  max-width:380px;
+  background:#fff0f6;
+  border-radius:26px;
+  padding:26px 22px 32px;
+  text-align:center;
+  box-shadow:0 15px 40px rgba(0,0,0,0.18);
+  position:relative;
+}
+
+h1{
+  font-size:23px;
+  color:#ff3f7f;
+  margin-bottom:6px;
+}
+
+#sub{
+  font-size:14px;
+  color:#666;
+  margin-bottom:14px;
+}
+
+#message{
+  min-height:26px;
+  margin-bottom:16px;
+  color:#ff3f7f;
+  font-weight:600;
+}
+
+.options{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+button{
+  padding:14px;
+  border:none;
+  border-radius:25px;
+  font-size:15px;
+  background:white;
+  border:2px solid #ffb6cf;
+}
+
+#finalArea{
+  position:relative;
+  height:120px;
+}
+
+#yes{
+  background:#ff3f7f;
+  color:white;
+  position:absolute;
+  left:18%;
+}
+
+#no{
+  background:#ddd;
+  position:absolute;
+  left:55%;
+}
+</style>
+</head>
+
+<body>
+
+<audio id="music" loop>
+  <!-- Bollywood-style instrumental (safe & light) -->
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3">
+</audio>
+
+<div class="card" id="card"></div>
+
+<script>
+const card = document.getElementById("card");
+const music = document.getElementById("music");
+
+let qIndex = 0;
+let startedMusic = false;
+
+const questions = [
+  {
+    q: "When did we first meet?",
+    options: ["At college 😄","By destiny ✨"],
+    correct: 1
+  },
+  {
+    q: "What do you like the most about us?",
+    options: ["Our bonding ❤️","Everything 🥰"],
+    correct: 1
+  }
+];
+
+const noMessages = [
+  "Nice try 😜",
+  "Almost 😏",
+  "Haha nope 😂",
+  "You can't press this 💃",
+  "Only YES allowed 😍"
+];
+
+let noIndex = 0;
+
+function playMusic(){
+  if(!startedMusic){
+    music.play().catch(()=>{});
+    startedMusic = true;
+  }
+}
+
+function showQuestion(){
+  const q = questions[qIndex];
+  card.innerHTML = `
+    <h1>${q.q}</h1>
+    <div id="message"></div>
+    <div class="options">
+      ${q.options.map((o,i)=>
+        `<button onclick="answer(${i})">${o}</button>`
+      ).join("")}
+    </div>
+  `;
+}
+
+function answer(i){
+  playMusic();
+  const q = questions[qIndex];
+  const msg = document.getElementById("message");
+
+  if(i === q.correct){
+    msg.innerText = "Correct 💖";
+  }else{
+    msg.innerText = "Hmm… not quite 😅";
+  }
+
+  setTimeout(()=>{
+    qIndex++;
+    if(qIndex < questions.length){
+      showQuestion();
+    }else{
+      finalIntro();
+    }
+  },1000);
+}
+
+function finalIntro(){
+  card.innerHTML = `
+    <h1>Okay…</h1>
+    <div id="sub">One last important question 🥺</div>
+    <button onclick="finalQuestion()" style="
+      background:#ff3f7f;color:white;
+      padding:14px;border-radius:25px;border:none;
+      ">Continue 💝</button>
+  `;
+}
+
+function finalQuestion(){
+  card.innerHTML = `
+    <h1>Will you be my Valentine? 💖</h1>
+    <div id="message"></div>
+    <div id="finalArea">
+      <button id="yes" onclick="yes()">Yes 😍</button>
+      <button id="no">No 🙄</button>
+    </div>
+  `;
+
+  const noBtn = document.getElementById("no");
+  const msg = document.getElementById("message");
+  const area = document.getElementById("finalArea");
+
+  function moveNo(){
+    const ar = area.getBoundingClientRect();
+    const br = noBtn.getBoundingClientRect();
+    noBtn.style.left = Math.random()*(ar.width-br.width)+"px";
+    noBtn.style.top  = Math.random()*(ar.height-br.height)+"px";
+    msg.innerText = noMessages[noIndex % noMessages.length];
+    noIndex++;
+  }
+
+  document.addEventListener("mousemove",e=>{
+    const r = noBtn.getBoundingClientRect();
+    const d = Math.hypot(
+      e.clientX-(r.left+r.width/2),
+      e.clientY-(r.top+r.height/2)
+    );
+    if(d<70) moveNo();
+  });
+
+  document.addEventListener("touchmove",e=>{
+    const t=e.touches[0];
+    const r=noBtn.getBoundingClientRect();
+    const d=Math.hypot(
+      t.clientX-(r.left+r.width/2),
+      t.clientY-(r.top+r.height/2)
+    );
+    if(d<70) moveNo();
+  },{passive:true});
+}
+
+function yes(){
+  card.innerHTML = `
+    <h1>I knew it 💕</h1>
+    <p style="font-size:18px;color:#ff3f7f;">
+      I Love You 😘
+    </p>
+  `;
+}
+
+showQuestion();
+</script>
+
+</body>
+</html>
